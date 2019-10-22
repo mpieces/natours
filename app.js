@@ -3,6 +3,8 @@ const express = require('express');
 
 const app = express();
 
+// MIDDLEWARE = function that can modify incoming request data; step request goes through in process
+app.use(express.json());
 // app.get('/', (req, res) => {
 //     res
 //         .status(200)
@@ -16,7 +18,7 @@ const app = express();
 //     res.send('You can post to this endpoint...');
 // })
 
-const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours.json`));
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`));
 // *** resource = tours
 app.get('/api/v1/tours', (req, res) => {
     res.status(200).json({
@@ -29,6 +31,25 @@ app.get('/api/v1/tours', (req, res) => {
     })
 });
 
+app.post('/api/v1/tours', (req, res) => {
+    // console.log(req.body);
+    const newId = tours[tours.length - 1].id + 1
+    const newTour = Object.assign({
+        id: newId
+    }, req.body);
+
+    tours.push(newTour);
+
+    fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours), err => {
+        res.status(201).json({
+            status: 'success',
+            data: {
+                tour: newTour
+            }
+        })
+    })
+    // res.send('Done');
+})
 
 const port = 3000;
 app.listen(port, () => {
