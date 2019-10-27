@@ -5,22 +5,11 @@ const app = express();
 
 // MIDDLEWARE = function that can modify incoming request data; step request goes through in process
 app.use(express.json());
-// app.get('/', (req, res) => {
-//     res
-//         .status(200)
-//         .json({
-//             message: 'Hello from the server side!',
-//             app: 'Natours!'
-//         });
-// });
-
-// app.post('/', (req, res) => {
-//     res.send('You can post to this endpoint...');
-// })
 
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`));
 // *** resource = tours
-app.get('/api/v1/tours', (req, res) => {
+
+const getAllTours = (req, res) => {
     res.status(200).json({
         // format data using jsend specification
         status: 'success',
@@ -28,11 +17,10 @@ app.get('/api/v1/tours', (req, res) => {
         data: {
             tours
         }
-    })
-});
+    });
+};
 
-app.get('/api/v1/tours/:id', (req, res) => {
-
+const getTour = (req, res) => {
     console.log(req.params);
     // multiplying by 1 converts string to a number
     const id = req.params.id * 1
@@ -50,9 +38,9 @@ app.get('/api/v1/tours/:id', (req, res) => {
             tour
         }
     })
-});
+};
 
-app.post('/api/v1/tours', (req, res) => {
+const createTour = (req, res) => {
     // console.log(req.body);
     const newId = tours[tours.length - 1].id + 1
     const newTour = Object.assign({
@@ -69,10 +57,9 @@ app.post('/api/v1/tours', (req, res) => {
             }
         })
     })
-    // res.send('Done');
-})
+};
 
-app.patch('/api/v1/tours/:id', (req, res) => {
+const updateTour = (req, res) => {
 
     if (req.params.id * 1 > tours.length) {
         return res.status(404).json({
@@ -87,7 +74,39 @@ app.patch('/api/v1/tours/:id', (req, res) => {
             tour: '<Updated tour here....>'
         }
     })
-})
+};
+
+const deleteTour = (req, res) => {
+
+    if (req.params.id * 1 > tours.length) {
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Invalid ID'
+        });
+    }
+    //  status 204 means no content
+    res.status(204).json({
+        status: 'success',
+        // data sent back is null
+        data: null
+    })
+};
+
+// app.get('/api/v1/tours', getAllTours);
+// app.get('/api/v1/tours/:id', getTour);
+// app.post('/api/v1/tours', createTour);
+// app.patch('/api/v1/tours/:id', updateTour);
+// app.delete('/api/v1/tours/:id', deleteTour);
+
+app
+    .route('/api/v1/tours')
+    .get(getAllTours)
+    .post(createTour);
+app
+    .route('/api/v1/tours/:id')
+    .get(getTour)
+    .patch(updateTour)
+    .delete(deleteTour);
 
 const port = 3000;
 app.listen(port, () => {
