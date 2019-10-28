@@ -7,7 +7,10 @@ const userRouter = require('./routes/userRoutes');
 const app = express();
 
 // 1) MIDDLEWARES ///////////////////////
-app.use(morgan('dev'));
+if (process.env.NODE_ENV === 'development') {
+    app.use(morgan('dev'));
+}
+
 
 // MIDDLEWARE = function that can modify incoming request data; step request goes through in process
 // returns a function and that function is then added to the middleware stack
