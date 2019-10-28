@@ -3,7 +3,29 @@ const fs = require('fs');
 const tours = JSON.parse(
     fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 );
-// *** resource = tours
+
+exports.checkID = (req, res, next, val) => {
+    if (req.params.id * 1 > tours.length) {
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Invalid ID'
+        });
+    }
+    next();
+};
+
+// checkBody middleware fxn to check if body contains the name and price properties
+// if not, send back 400 (bad request)
+// add it to the post handler stack
+exports.checkBody = (req, res, next) => {
+    if (!req.body.name || !req.body.price) {
+        return res.status(400).json({
+            status: 'fail',
+            message: 'Missing name or price'
+        })
+    }
+    next();
+};
 
 
 exports.getAllTours = (req, res) => {
@@ -21,20 +43,12 @@ exports.getAllTours = (req, res) => {
 
 exports.getTour = (req, res) => {
     console.log(req.params);
-    // multiplying by 1 converts string to a number
-    exports.id = req.params.id * 1
-    exports.tour = tours.find(el => el.id === id)
-    if (id > tours.length) {
-        return res.status(404).json({
-            status: 'fail',
-            message: 'Invalid ID'
-        });
-    }
+
     res.status(200).json({
         // format data using jsend specification
         status: 'success',
         data: {
-            tour
+            tours
         }
     })
 };
@@ -60,12 +74,6 @@ exports.createTour = (req, res) => {
 
 exports.updateTour = (req, res) => {
 
-    if (req.params.id * 1 > tours.length) {
-        return res.status(404).json({
-            status: 'fail',
-            message: 'Invalid ID'
-        });
-    }
 
     res.status(200).json({
         status: 'success',
@@ -76,13 +84,6 @@ exports.updateTour = (req, res) => {
 };
 
 exports.deleteTour = (req, res) => {
-
-    if (req.params.id * 1 > tours.length) {
-        return res.status(404).json({
-            status: 'fail',
-            message: 'Invalid ID'
-        });
-    }
     //  status 204 means no content
     res.status(204).json({
         status: 'success',

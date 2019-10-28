@@ -12,6 +12,7 @@ app.use(morgan('dev'));
 // MIDDLEWARE = function that can modify incoming request data; step request goes through in process
 // returns a function and that function is then added to the middleware stack
 app.use(express.json());
+app.use(express.static(`${__dirname}/public`));
 
 // apply to every single request
 app.use((req, res, next) => {
