@@ -1,33 +1,41 @@
-// const fs = require('fs');
 const Tour = require('./../models/tourModel');
 
-// const tours = JSON.parse(
-//     fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
-// );
+exports.getAllTours = async (req, res) => {
+    try {
+        const tours = await Tour.find();
 
-exports.getAllTours = (req, res) => {
-    console.log(req.requestTime);
-    res.status(200).json({
-        // format data using jsend specification
-        status: 'success',
-        requestedAt: req.requestTime,
-        // results: tours.length,
-        // data: {
-        //     tours
-        // }
-    });
+        res.status(200).json({
+            status: 'success',
+            results: tours.length,
+            data: {
+                tours
+            }
+        });
+    } catch (err) {
+        // won't be any validation errors
+        res.status(404).json({
+            status: 'fail',
+            message: err
+        });
+    }
 };
 
-exports.getTour = (req, res) => {
-    console.log(req.params);
-
-    // res.status(200).json({
-    //     // format data using jsend specification
-    //     status: 'success',
-    //     data: {
-    //         tours
-    //     }
-    // });
+exports.getTour = async (req, res) => {
+    try {
+        const tour = await Tour.findById(req.params.id);
+        // short hand for Tour.findOne({ _id: req.params.id })
+        res.status(200).json({
+            status: 'success',
+            data: {
+                tour
+            }
+        });
+    } catch (err) {
+        res.status(404).json({
+            status: 'fail',
+            message: err
+        });
+    }
 };
 
 exports.createTour = async (req, res) => {
