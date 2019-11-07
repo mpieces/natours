@@ -78,11 +78,19 @@ exports.updateTour = async (req, res) => {
 
 };
 
-exports.deleteTour = (req, res) => {
-    //  status 204 means no content
-    res.status(204).json({
-        status: 'success',
-        // data sent back is null
-        data: null
-    });
+exports.deleteTour = async (req, res) => {
+    try {
+        await Tour.findByIdAndDelete(req.params.id);
+        //  status 204 means no content
+        res.status(204).json({
+            status: 'success',
+            // data sent back is null
+            data: null
+        });
+    } catch (err) {
+        res.status(400).json({
+            status: 'fail',
+            message: err
+        });
+    }
 };
